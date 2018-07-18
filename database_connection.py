@@ -1,10 +1,13 @@
 import psycopg2
-
-
+import base64
+import datetime
 
 class Connection():
     def __getconnection__(self):
         return psycopg2.connect(user='Bakhtiyar', password='pakistan', database='salesman', host='localhost')
+    
+    def getPublicConnection(self):
+        return self.connection
 
     def __init__(self):
         self.connection = self.__getconnection__()
@@ -37,7 +40,8 @@ class Connection():
         self.sqlCreateShopTable = "CREATE TABLE IF NOT EXISTS shop(ID SERIAL PRIMARY KEY," \
                                   "MANAGER_ID INTEGER DEFAULT 0," \
                                   "MERCH_ID INTEGER DEFAULT 0," \
-                                  "SHOP_NAME CHARACTER VARYING(255) NOT NULL DEFAULT '')"
+                                  "SHOP_NAME CHARACTER VARYING(255) NOT NULL DEFAULT '', " \
+                                  "IS_ACTIVE BOOLEAN DEFAULT FALSE)"
 
         self.sqlCreateDisplayTable = "CREATE TABLE IF NOT EXISTS display(ID SERIAL PRIMARY KEY," \
                                      "SHOP_ID INTEGER NOT NULL, " \
@@ -69,10 +73,6 @@ class Connection():
                                       "IMAGE_PATH CHARACTER VARYING(400), " \
                                       "DATE_TODAY TIMESTAMP DEFAULT NOW())"
 
-        self.sqlCreateStatusTable = "CREATE TABLE IF NOT EXISTS STATUS (ID SERIAL PRIMARY KEY, " \
-                                    "REF_ID INTEGER DEFAULT 0," \
-                                    "IS_ACTIVE INTEGER DEFAULT 0)"
-
         self.sqlCreateProductTypeTable = "CREATE TABLE IF NOT EXISTS product_type_table(ID SERIAL PRIMARY KEY, " \
                                          "MANAGER_ID INTEGER NOT NULL," \
                                          "TITLE CHARACTER VARYING(40) NOT NULL DEFAULT '')";
@@ -86,12 +86,8 @@ class Connection():
                                      "PRODUCT_TYPE_ID INTEGER NOT NULL, " \
                                      "PRODUCT_SUB_TYPE_ID INTEGER NOT NULL, " \
                                      "TITLE CHARACTER VARYING(40) DEFAULT '', " \
-                                     "IMAGE_PATH CHARACTER VARYING(80) DEFAULT '')"
-
-        self.sqlCreateIsAvailableTable = "CREATE TABLE IF NOT EXISTS isavailable(ID SERIAL PRIMARY KEY, " \
-                                         "PRODUCT_ID INTEGER NOT NULL," \
-                                         "SHOP_ID INTEGER NOT NULL," \
-                                         "ISAVAILABLEPRODUCT BOOLEAN DEFAULT FALSE)"
+                                     "IMAGE_PATH CHARACTER VARYING(80) DEFAULT '',"\
+                                     "ISAVAILABLEPRODUCT BOOLEAN DEFAULT FALSE)"
 
         self.sqlCreateLatLongTable = "CREATE TABLE IF NOT EXISTS merch_location(ID SERIAL PRIMARY KEY, " \
                                      "MERCH_ID INTEGER DEFAULT 0, " \
@@ -107,17 +103,13 @@ class Connection():
             cursor.execute(self.sqlCreateOurTable)
             cursor.execute(self.sqlCreateCompetitorTable)
             cursor.execute(self.sqlCreatePicturesTable)
-            # cursor.execute(self.sqlCreateProductTypeTable)
-            # cursor.execute(self.sqlCreateProductSubTypeTable)
+            cursor.execute(self.sqlCreateProductTypeTable)
+            cursor.execute(self.sqlCreateProductSubTypeTable)
             cursor.execute(self.sqlCreateProductTable)
-            cursor.execute(self.sqlCreateStatusTable)
-            cursor.execute(self.sqlCreateIsAvailableTable)
             cursor.execute(self.sqlCreateLatLongTable)
         self.connection.commit()
 
-
     def createManager(self,name,email,password,company_name,isonline):
-
         query = "INSERT INTO manager (NAME,EMAIL,PASSWORD,COMPANYNAME,ISONLINE) VALUES (%s,%s,%s,%s,%s)";
 
         with self.connection.cursor() as cursor:
@@ -135,6 +127,8 @@ class Connection():
     def createAreaManager(self,manager_id,name,password,time_stamp,latitude,longitude):
 
         location_id = self.createLocationForAreaManager(latitude,longitude);
+
+        print(str(location_id))
 
         query = "INSERT INTO area_manager(MANAGER_ID,NAME,PASSWORD,DATE_TODAY,LOCATION_ID) VALUES(%s,%s,%s,%s,%s)";
 
@@ -155,13 +149,13 @@ class Connection():
 
     def createLocationForAreaManager(self,latitude,longitude):
 
-        query = "INSERT INTO merch_location (LATITUDE, LONGITUDE) VALUES (%s,$s) RETURNING ID";
+        query = "INSERT INTO merch_location(LATITUDE, LONGITUDE) VALUES (%s,%s) RETURNING ID";
 
         with self.connection.cursor() as cursor:
             try:
                 cursor.execute(query,(latitude,longitude))
                 self.connection.commit()
-                id = cursor.fetchone()['0']
+                id = cursor.fetchone()[0]
                 return id
             except Exception as e:
                 print(str(e))
@@ -186,12 +180,13 @@ class Connection():
 
 
     def createShop(self,MANAGER_ID,AREA_MANAGER_ID,MERCH_ID,SHOP_NAME):
-        query = "INSERT INTO shop(MANAGER_ID,AREA_MANAGER_ID,MERCH_ID,SHOP_NAME) VALUES" \
-                 "(%s,%s,%s,%s)";
+        query = "INSERT INTO shop(MANAGER_ID,MERCH_ID,SHOP_NAME) VALUES" \
+                 "(%s,%s,%s)";
+
 
         with self.connection.cursor() as cursor:
             try:
-                cursor.execute(query, (MANAGER_ID, AREA_MANAGER_ID, MERCH_ID, SHOP_NAME))
+                cursor.execute(query, (MANAGER_ID, MERCH_ID, SHOP_NAME))
                 self.connection.commit()
                 return {'error': -1}
             except Exception as e:
@@ -201,11 +196,9 @@ class Connection():
 
     def createDisplay(self,SHOP_ID,PRODUCT_TYPE_ID,PRODUCT_SUB_TYPE_ID,COMMENTS,image,DATETODAY):
 
-        IMAGE_PATH = 'THERE IS IMAGE CONVERTER FUNCTION WILL CALL';
-
+        IMAGE_PATH = self.convertBase64ToImage(image);
         query = "INSERT INTO display(SHOP_ID,PRODUCT_TYPE_ID, PRODUCT_SUB_TYPE_ID, COMMENTS,IMAGE_PATH,DATETODAY) VALUES " \
                 "(%s,%s,%s,%s,%s)";
-
         with self.connection.cursor() as cursor:
             try:
                 cursor.execute(query, (SHOP_ID, PRODUCT_TYPE_ID, PRODUCT_SUB_TYPE_ID, COMMENTS, IMAGE_PATH, DATETODAY))
@@ -267,7 +260,7 @@ class Connection():
                 self.connection.rollback()
                 return {'error': 1}
 
-
+    # product is available or not
     def createStatus(self,REF_ID,IS_ACTIVE = 0):
         query = "INSERT INTO STATUS (REF_ID,IS_ACTIVE) VALUES " \
                 "(%s,%s)"
@@ -281,9 +274,37 @@ class Connection():
                 self.connection.rollback()
                 return {'error': 1}
 
-    def createProduct(self,MANAGER_ID,PRODUCT_TYPE_ID,PRODUCT_SUB_TYPE_ID,TITLE,IMAGE):
-        IMAGE_PATH = 'THERE IS IMAGE CONVERTER FUNCTION WILL CALL';
+    def createProductType(self,manager_id,product_type_title,product_sub_type_title,product_title, image):
+        image_path = "image converter"
+        query = "INSERT INTO product_type_table (MANAGER_ID,TITLE) VALUES" \
+                "(%S,%S) RETURNING ID"
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(query,(manager_id,product_type_title))
+                self.connection.commit()
+                product_type_id = cursor.fetchone()['0']
+                self.createProductSubType(manager_id,product_type_id,product_sub_type_title,product_title,image_path)
+                return {'error': -1}
+            except Exception as e:
+                self.connection.rollback()
+                return {'error': 1}
 
+    def createProductSubType(self,manager_id,product_type_id,title,product_title,image_path):
+        query = "INSERT INTO product_sub_type_table(PRODUCT_TYPE_ID,TITLE) VALUES" \
+                "(%S,%S) RETURNING ID"
+        with self.connection.cursor() as cursor:
+            try:
+                cursor.execute(query, (product_type_id, title))
+                self.connection.commit()
+                product_sub_type_id = cursor.fetchone()['0']
+                self.createProduct(manager_id,product_type_id,product_sub_type_id,product_title,image_path)
+                return {'error': -1}
+            except Exception as e:
+                self.connection.rollback()
+                return {'error': 1}
+
+    def createProduct(self,MANAGER_ID,PRODUCT_TYPE_ID = 0,PRODUCT_SUB_TYPE_ID = 0,TITLE = '',IMAGE = ''):
+        IMAGE_PATH = 'THERE IS IMAGE CONVERTER FUNCTION WILL CALL';
         query = "INSERT INTO STATUS (MANAGER_ID,PRODUCT_TYPE_ID,PRODUCT_SUB_TYPE_ID,TITLE,IMAGE_PATH) VALUES " \
                 "(%s,%s,%s,%s,%s)"
         with self.connection.cursor() as cursor:
@@ -295,7 +316,6 @@ class Connection():
                 print(str(e))
                 self.connection.rollback()
                 return {'error': 1}
-
 
     def createIsAvailable(self,PRODUCT_ID,SHOP_ID,ISAVAILABLEPRODUCT):
         query = "INSERT INTO STATUS (PRODUCT_ID,SHOP_ID,ISAVAILABLEPRODUCT) VALUES " \
@@ -309,3 +329,21 @@ class Connection():
                 print(str(e))
                 self.connection.rollback()
                 return {'error': 1}
+
+    def convertBase64ToImage(self, image):
+        date = datetime.datetime.now()
+        image_name = 'IMG_' + str(date.day) + "_" + str(date.month) + "_" + str(date.year) + "_" + str(
+            date.hour) + "_" + str(date.minute) + "_" + str(date.microsecond) + ".jpg"
+        ima_64_decode = base64.b64decode(image)
+        with open(image_name, 'wb') as f:
+            f.write(ima_64_decode)
+            return image_name
+        print(str(date.day))
+        print(str(date.month))
+        print(str(date.year))
+        print(str(date.hour))
+        print(str(date.minute))
+        print(str(date.second))
+        print(str(date.microsecond))
+
+connection = Connection();
