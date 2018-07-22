@@ -1,6 +1,5 @@
 from flask import request, json
-from database_connection import connection
-from services.manager import createManager
+from services.manager import createManager, updateManager
 
 def manager(app):
     @app.route('/manager', methods=['POST', 'GET'])
@@ -16,13 +15,13 @@ def manager(app):
             return "hello"
 
     @app.route('/manager/<id>', methods=['POST', 'GET'])
-    def updateManager():
+    def editManager():
         if request.method == 'POST':
             name = request.form['name']
             email = request.form['email']
             password = request.form['password']
             company_name = request.form['company_name']
-            connection.createManager(name, email, password, company_name, True)
+            updateManager(name, email, password, company_name, True)
             return name
         else:
             return "hello"

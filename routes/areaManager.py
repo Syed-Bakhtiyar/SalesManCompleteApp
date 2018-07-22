@@ -1,5 +1,5 @@
 from flask import request, json
-from database_connection import connection
+from services.areaManager import addAreaManager
 
 def areaManager(app):
     @app.route('/createareamanager', methods=['POST', 'GET'])
@@ -11,7 +11,7 @@ def areaManager(app):
             time_stamp = request.form['date_today']
             latitude = request.form['latitude']
             longitude = request.form['longitude']
-            connection.createAreaManager(manager_id, name, password, time_stamp, latitude, longitude)
+            addAreaManager(manager_id, name, password, time_stamp, latitude, longitude)
             return name
         else:
             return "hello"

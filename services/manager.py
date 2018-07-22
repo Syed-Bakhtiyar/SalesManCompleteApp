@@ -13,3 +13,16 @@ def createManager(name,email,password,company_name,isonline):
             print(str(e))
             getPublicConnection.rollback()
             return {'error': 1}
+
+def updateManager(self, id,name,company_name):
+    query = "UPDATE manager SET NAME = %s, COMPANYNAME = %s WHERE id = "+str(id);
+
+    with getPublicConnection.cursor() as cursor:
+        try:
+            cursor.execute(query,(name,company_name))
+            self.connection.commit()
+            return {'error':-1}
+        except Exception:
+            self.connection.rollback()
+            return {'error': 1}
+
