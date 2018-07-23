@@ -10,9 +10,9 @@ def createLocationForAreaManager(latitude,longitude):
     with getPublicConnection as cursor:
         try:
             cursor.execute(query,(latitude,longitude))
-            self.connection.commit()
+            getPublicConnection.commit()
             id = cursor.fetchone()[0]
             return id
         except Exception:
-            self.connection.rollback()
+            getPublicConnection.rollback()
             return 0

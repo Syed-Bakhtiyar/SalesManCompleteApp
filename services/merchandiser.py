@@ -8,8 +8,8 @@ def createMerchandiser(self,AREA_MANAGER_ID,SHOP_ID,NAME,EMAIL,PASSWORD,COMPANYN
         with getPublicConnection as cursor:
             try:
                 cursor.execute(query,(AREA_MANAGER_ID,SHOP_ID,NAME,EMAIL,PASSWORD,COMPANYNAME,ISONLINE,time_stamp))
-                self.connection.commit()
+                getPublicConnection.commit()
                 return {'error':-1}
             except Exception:
-                self.connection.rollback()
+                getPublicConnection.rollback()
                 return {'error':1}

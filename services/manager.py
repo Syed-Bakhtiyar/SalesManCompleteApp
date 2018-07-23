@@ -20,9 +20,9 @@ def updateManager(self, id,name,company_name):
     with getPublicConnection.cursor() as cursor:
         try:
             cursor.execute(query,(name,company_name))
-            self.connection.commit()
+            getPublicConnection.commit()
             return {'error':-1}
         except Exception:
-            self.connection.rollback()
+            getPublicConnection.rollback()
             return {'error': 1}
 
