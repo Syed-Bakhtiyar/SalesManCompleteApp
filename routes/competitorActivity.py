@@ -2,7 +2,7 @@ from flask import request, json
 from database_connection import connection
 
 def competitorActivity(app):    
-    @app.route('/createcompactivity', methods=['POST', 'GET'])
+    @app.route('/competitorActivity', methods=['POST', 'GET'])
     def createCompActivity():
         if request.method == 'POST':
             shop_id = request.form['shop_id']

@@ -25,3 +25,4 @@ def manager(app):
             return name
         else:
             return "hello"
+# raise Exception('x should not exceed 5. The value of x was: {}'.format(x))

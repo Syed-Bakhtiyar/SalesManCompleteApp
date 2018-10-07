@@ -2,7 +2,7 @@ from flask import request, json
 from database_connection import connection
 
 def display(app):
-    @app.route('/createdisplay', methods=['POST', 'GET'])
+    @app.route('/display', methods=['POST', 'GET'])
     def createDisplay():
         if request.method == 'POST':
             shop_id = request.form['shop_id']

@@ -1,6 +1,8 @@
 import psycopg2
 import base64
 import datetime
+from schemas.admin import sqlCreateAdminTable
+from schemas.company import sqlCreateCompanyTable
 from schemas.managerSchema import sqlCreateManagerTable
 from schemas.areaManagerSchema import sqlCreateAreaManagerTable
 from schemas.merchandiserSchema import sqlCreateMerchandiserTable
@@ -16,7 +18,7 @@ from schemas.latlngSchema import sqlCreateLatLongTable
 
 class Connection():
     def __getconnection__(self):
-        return psycopg2.connect(user='Bakhtiyar', password='pakistan', database='salesman', host='localhost')
+        return psycopg2.connect(user='Bakhtiyar', password='pakistan', database='store_perfect', host='localhost')
     
     def getPublicConnection(self):
         return self.connection
@@ -25,6 +27,9 @@ class Connection():
         self.connection = self.__getconnection__()
         
         with self.connection.cursor() as cursor:
+            cursor.execute(sqlCreateAdminTable)
+            cursor.execute(sqlCreateManagerTable)
+            cursor.execute(sqlCreateCompanyTable)
             cursor.execute(sqlCreateManagerTable)
             cursor.execute(sqlCreateAreaManagerTable)
             cursor.execute(sqlCreateMerchandiserTable)

@@ -2,7 +2,7 @@ from flask import request, json
 from services.merchandiser import createMerchandiser
 
 def merchandiser(app):
-    @app.route('/createmerchandiser', methods=['POST', 'GET'])
+    @app.route('/merchandiser', methods=['POST', 'GET'])
     def addMerchandiser():
         if request.method == 'POST':
             area_manager_id = request.form['area_manager_id']

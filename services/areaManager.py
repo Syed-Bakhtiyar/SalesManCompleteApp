@@ -1,6 +1,6 @@
 from database_connection import connection
 from common.common import convertBase64ToImage
-from latlng import createLocationForAreaManager
+from services.latlng import createLocationForAreaManager
 import psycopg2
 
 getPublicConnection = connection.getPublicConnection()

@@ -2,7 +2,7 @@ from flask import request, json
 from services.product import createProduct, createProductType, createProductSubType
 
 def product(app):
-    @app.route('/createproduct', methods=['POST', 'GET'])
+    @app.route('/product', methods=['POST', 'GET'])
     def addProduct():
         if request.method == 'POST':
             manager_id = request.form['manager_id']
@@ -19,16 +19,16 @@ def product(app):
     def addProductType():
         if request.method == 'POST':
             manager_id = request.form['manager_id']
-            product_title = request.form['title']:
+            product_title = request.form['title']
             createProductType(manager_id, product_title)
         else:
             return 'hello'
 
-    @app.route('/createProductSubType', methods=['POST', 'GET'])
+    @app.route('/productSubType', methods=['POST', 'GET'])
     def addProductSubType():
         if request.method == 'POST':
             product_type_id = request.form['product_type_id']
-            product_title = request.form['title']:
+            product_title = request.form['title']
             createProductSubType(product_type_id, product_title)
         else:
             return 'hello'

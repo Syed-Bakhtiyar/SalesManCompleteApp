@@ -2,7 +2,7 @@ from flask import request, json
 from services.activity import creatrOurActivity
 
 def ourActivity(app):
-    @app.route('/createouractivity', methods=['POST', 'GET'])
+    @app.route('/activity', methods=['POST', 'GET'])
     def addOurActivity():
         if request.method == 'POST':
             shop_id = request.form['shop_id']

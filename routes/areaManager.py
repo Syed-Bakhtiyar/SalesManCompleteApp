@@ -2,7 +2,7 @@ from flask import request, json
 from services.areaManager import addAreaManager
 
 def areaManager(app):
-    @app.route('/createareamanager', methods=['POST', 'GET'])
+    @app.route('/areaManager', methods=['POST', 'GET'])
     def createAreaManager():
         if request.method == 'POST':
             manager_id = request.form['manager_id']
