@@ -1,15 +1,17 @@
 from flask import request, json
+# from services.admin import createAdmin
+from roles import ROLES
 from services.admin import createAdmin
 
 def admin(app):
     @app.route('/admin', methods=['POST', 'GET'])
     def addAdmin():
         if request.method == 'POST':
-            name = request.form['name']
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
             email = request.form['email']
             password = request.form['password']
-            isOnline = request.form['isOnline']
-            createAdmin(name, email, password,isOnline)
-            return name
+            user = createAdmin(first_name, last_name, email, password, ROLES['ADMIN'])
+            return user
         else:
             return "hello"

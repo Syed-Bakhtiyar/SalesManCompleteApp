@@ -3,16 +3,15 @@ import psycopg2
 
 getPublicConnection = connection.getPublicConnection()
 
-def createLocationForAreaManager(latitude,longitude):
+def createLocation(latitude,longitude):
     
-    query = "INSERT INTO merch_location(LATITUDE, LONGITUDE) VALUES (%s,%s) RETURNING ID";
+    query = "INSERT INTO location(LATITUDE, LONGITUDE) VALUES (%s,%s)";
 
     with getPublicConnection as cursor:
         try:
             cursor.execute(query,(latitude,longitude))
             getPublicConnection.commit()
-            id = cursor.fetchone()[0]
-            return id
+            return cursor.lastrowid
         except Exception:
             getPublicConnection.rollback()
             return 0

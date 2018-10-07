@@ -1,7 +1,9 @@
-sqlCreateCompetitorTable = "CREATE TABLE IF NOT EXISTS competitor_activities (ID SERIAL PRIMARY KEY, " \
-                                "SHOP_ID INTEGER NOT NULL, " \
-                                "PRODUCT_TYPE_ID INTEGER NOT NULL, " \
-                                "PRODUCT_SUB_TYPE_ID INTEGER NOT NULL, " \
-                                "COMMENTS CHARACTER VARYING(50) NOT NULL, " \
-                                "IMAGE_PATH CHARACTER VARYING(400), " \
-                                "DATE_TODAY TIMESTAMP DEFAULT NOW())"
+sqlCreateCompetitorTable = "CREATE TABLE IF NOT EXISTS competitor_activities(ID INT NOT NULL AUTO_INCREMENT," \
+                                "SHOP_ID INT NOT NULL," \
+                                "PRODUCT_ID INT NOT NULL," \
+                                "COMMENTS VARCHAR(255) NOT NULL UNIQUE," \
+                                "IMAGE_PATH VARCHAR(400) DEFAULT ''," \
+                                "DATE_TODAY TIMESTAMP DEFAULT CURRENT_TIMESTAMP," \
+                                "PRIMARY KEY (ID)," \
+                                "FOREIGN KEY (SHOP_ID) REFERENCES shop(ID)," \
+                                "FOREIGN KEY (PRODUCT_ID) REFERENCES product(ID))"

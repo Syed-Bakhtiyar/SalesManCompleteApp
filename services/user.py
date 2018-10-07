@@ -1,8 +1,7 @@
 from database_connection import connection
-from roles import ROLES
 getPublicConnection = connection.getPublicConnection()
 
-def createAdmin(first_name, last_name, email, password, role):
+def createUser(first_name, last_name, email, password, role):
     query = "INSERT INTO user (FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ISONLINE, ROLE) VALUES (%s,%s,%s,%s,%s)";
     with getPublicConnection.cursor() as cursor:
         try:

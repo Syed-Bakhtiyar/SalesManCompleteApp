@@ -2,14 +2,13 @@ from flask import request, json
 from services.shop import createShop
 
 def shop(app):
-    @app.route('/shop', methods=['POST', 'GET'])
-    def addShop():
+    @app.route('/company/<company_id>/shop', methods=['POST', 'GET'])
+    def addShop(company_id):
         if request.method == 'POST':
-            manager_id = request.form['manager_id']
-            area_manager_id = request.form['area_manager_id']
-            merch_id = request.form['merch_id']
             shop_name = request.form['shop_name']
-            createShop(manager_id, area_manager_id, merch_id, shop_name)
+            latitude = request.form['latitude']
+            longitude = request.form['longitude']
+            createShop(company_id, shop_name, latitude, longitude)
             return shop_name
         else:
             return "hello"
