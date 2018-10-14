@@ -19,5 +19,27 @@ def createAdmin(first_name, last_name, email, password, role):
     except Exception as e:
         print(str(e))
         getPublicConnection.rollback()
-        return {'error': 1}
+        raise e
 
+def authenticateUser(email, password):
+    try:
+        query = "SELECT * FROM user where EMAIL = "+ "'"+ email +"'"+" AND PASSWORD = " + "'" + password+ "'"
+        print(query)
+        cursor = getPublicConnection.cursor(buffered=True)
+        cursor.execute(query)
+        user = cursor.fetchone()
+        if not user:
+            return {
+                'status': 401,
+                'message': 'User Not Authenticated'
+            }
+        return {
+                'status': 200,
+                'message': user[0] 
+        } 
+    except Exception as identifier:
+        print('error ',identifier)
+        return {
+                'status': 500,
+                'message': 'Internal Server Error'
+        }
