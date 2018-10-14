@@ -1,5 +1,5 @@
 # import psycopg2
-import mysql.connector as mysql
+import mysql.connector
 import base64
 import datetime
 from schemas.user import sqlCreateUser
@@ -16,29 +16,31 @@ from schemas.latlngSchema import sqlCreateLatLongTable
 
 class Connection():
     def __getconnection__(self):
-        return mysql.connect(user='root', password='', database='store_perfect', host='localhost')
+        # print(mysql.connect(user='root', password='', database='store_perfect', host='localhost'))
+        return mysql.connector.connect(user='root', password='', database='store_perfect', host='localhost')
     
     def getPublicConnection(self):
         return self.connection
 
     def __init__(self):
+        self.connection = self.__getconnection__()
+        self.createTable()
+            
+    def createTable(self):
         try:
             self.connection = self.__getconnection__()
-            
-            with self.connection.cursor() as cursor:
-                cursor.execute(sqlCreateUser)
-                cursor.execute(sqlCreateCompanyTable)
-                cursor.execute(sqlCreateShopTable)
-                cursor.execute(sqlCreateDisplayTable)
-                cursor.execute(sqlCreateOurTable)
-                cursor.execute(sqlCreateCompetitorTable)
-                cursor.execute(sqlCreatePicturesTable)
-                cursor.execute(sqlCreateProductTypeTable)
-                cursor.execute(sqlCreateProductSubTypeTable)
-                cursor.execute(sqlCreateProductTable)
-                cursor.execute(sqlCreateLatLongTable)
+            self.connection.cursor().execute(sqlCreateUser)
+            self.connection.cursor().execute(sqlCreateCompanyTable)
+            self.connection.cursor().execute(sqlCreateShopTable)
+            self.connection.cursor().execute(sqlCreateProductTypeTable)
+            self.connection.cursor().execute(sqlCreateProductSubTypeTable)
+            self.connection.cursor().execute(sqlCreateProductTable)
+            self.connection.cursor().execute(sqlCreateDisplayTable)
+            self.connection.cursor().execute(sqlCreateOurTable)
+            self.connection.cursor().execute(sqlCreateCompetitorTable)
+            self.connection.cursor().execute(sqlCreatePicturesTable)
+            self.connection.cursor().execute(sqlCreateLatLongTable)
             self.connection.commit()
-        except Exception as identifier:
-            print(str(identifier))
-
+        except Exception as error:
+            print(error)
 connection = Connection();

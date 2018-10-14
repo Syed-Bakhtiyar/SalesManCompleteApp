@@ -12,5 +12,5 @@ sqlCreateShopTable = "CREATE TABLE IF NOT EXISTS shop (" \
                         "FOREIGN KEY (MANAGER_ID) REFERENCES user(ID),"\
                         "FOREIGN KEY (AREA_MANAGER_ID) REFERENCES user(ID),"\
                         "FOREIGN KEY (MERCH_ID) REFERENCES user(ID),"\
-                        "FOREIGN KEY (MERCH_ID) REFERENCES user(ID),"\
+                        "FOREIGN KEY (MERCH_ID) REFERENCES user(ID)"\
                         ")"

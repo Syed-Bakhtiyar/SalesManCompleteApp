@@ -12,6 +12,7 @@ def admin(app):
             email = request.form['email']
             password = request.form['password']
             user = createAdmin(first_name, last_name, email, password, ROLES['ADMIN'])
+            print(user)
             return user
         else:
             return "hello"
