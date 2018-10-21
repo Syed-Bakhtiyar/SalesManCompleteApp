@@ -16,7 +16,10 @@ def createCompany(adminId, companyName):
     except Exception as e:
         print(str(e))
         getPublicConnection.rollback()
-        return {'error': 1}
+        return {
+                'status': 500,
+                'message': 'Internal Server Error'
+        }
 
 def getAllCompanies(admin_id):
     try:
@@ -40,4 +43,35 @@ def getAllCompanies(admin_id):
                 'status': 500,
                 'message': 'Internal Server Error'
         }
-    
+
+def updateCompany(company_id, name):
+    query = "UPDATE company SET NAME = %s WHERE ID = %s"
+    try:
+        getPublicConnection.cursor().execute(query,(name, company_id))
+        getPublicConnection.commit()
+        return {
+            'message': 'Updated Successfully'
+        }
+    except Exception as error:
+        print(str(error))
+        getPublicConnection.rollback()
+        return {
+                'status': 500,
+                'message': 'Internal Server Error'
+        }
+
+def deleteCompany(company_id):
+    query = 'DELETE FROM company where ID = %s'
+    try:    
+        getPublicConnection.cursor().execute(query,(str(company_id),))
+        getPublicConnection.commit()
+        return {
+            'message': 'Deleted Successfully'
+        }
+    except Exception as error:
+        print(str(error))
+        getPublicConnection.rollback()
+        return {
+                'status': 500,
+                'message': 'Internal Server Error'
+        }
