@@ -5,24 +5,46 @@ import psycopg2
 
 getPublicConnection = connection.getPublicConnection()
 
-def addAreaManager(manager_id, first_name, last_name, email, password, role):
-    query = "INSERT INTO user (MANAGER_ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ISONLINE, ROLE) VALUES (%s, %s,%s,%s,%s,%s)";
-    with getPublicConnection.cursor() as cursor:
-        try:
-            cursor.execute(query,(manager_id, first_name, last_name, email, password, 1, role))
-            getPublicConnection.commit()
+def addAreaManager(admin_id, first_name, last_name, email, password, role):
+    query = "INSERT INTO user (ADMIN_ID, FIRST_NAME, LAST_NAME, EMAIL, PASSWORD, ISONLINE, ROLE) VALUES (%s, %s,%s,%s,%s,%s, %s)";
+    try:
+        getPublicConnection.cursor().execute(query,(admin_id,first_name, last_name, email, password, 1, role))
+        getPublicConnection.commit()
+        print(str(getPublicConnection) + 'this isssssssssss')
+        return {
+            'id': 1,
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'password': password
+        }
+    except Exception as e:
+        print(str(e))
+        getPublicConnection.rollback()
+        raise e
+
+def getAllAreaManagers(admin_id):
+    try:
+        query = "SELECT * FROM user where ADMIN_ID = " + "'" + admin_id+"' AND ROLE = 'AREAMANAGER'"
+        print(query)
+        cursor = getPublicConnection.cursor(buffered=True)
+        cursor.execute(query)
+        managers = cursor.fetchall()
+        if not managers:
             return {
-                'id': cursor.lastrowid,
-                'admin_id': manager_id,
-                'first_name': first_name,
-                'last_name': last_name,
-                'email': email,
-                'password': password
+                'status': 404,
+                'message': 'Not Found'
             }
-        except Exception as e:
-            print(str(e))
-            getPublicConnection.rollback()
-            return {'error': 1}
+        return {
+                'status': 200,
+                'message': managers 
+        } 
+    except Exception as error:
+        print('error ',error)
+        return {
+                'status': 500,
+                'message': 'Internal Server Error'
+        }
 
 # def addAreaManager(self,manager_id,name,password,time_stamp,latitude,longitude):
 #         location_id = createLocationForAreaManager(latitude,longitude);
