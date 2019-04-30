@@ -1,13 +1,10 @@
-# import psycopg2
 import mysql.connector
 import base64
 import datetime
 from schemas.user import sqlCreateUser
 from schemas.company import sqlCreateCompanyTable
 from schemas.shopSchema import sqlCreateShopTable
-from schemas.displaySchema import sqlCreateDisplayTable
-from schemas.activitySchema import sqlCreateOurTable
-from schemas.competitorActivitySchema import sqlCreateCompetitorTable
+from schemas.activityCompetitorDisplaySchema import sqlCreateOurTable
 from schemas.pictureSchema import sqlCreatePicturesTable
 from schemas.product.productTypeSchema import sqlCreateProductTypeTable
 from schemas.product.productSubTypeSchema import sqlCreateProductSubTypeTable
@@ -16,7 +13,6 @@ from schemas.latlngSchema import sqlCreateLatLongTable
 
 class Connection():
     def __getconnection__(self):
-        # print(mysql.connect(user='root', password='', database='store_perfect', host='localhost'))
         return mysql.connector.connect(user='root', password='', database='store_perfect', host='localhost')
     
     def getPublicConnection(self):
@@ -35,9 +31,7 @@ class Connection():
             self.connection.cursor().execute(sqlCreateProductTypeTable)
             self.connection.cursor().execute(sqlCreateProductSubTypeTable)
             self.connection.cursor().execute(sqlCreateProductTable)
-            self.connection.cursor().execute(sqlCreateDisplayTable)
             self.connection.cursor().execute(sqlCreateOurTable)
-            self.connection.cursor().execute(sqlCreateCompetitorTable)
             self.connection.cursor().execute(sqlCreatePicturesTable)
             self.connection.cursor().execute(sqlCreateLatLongTable)
             self.connection.commit()

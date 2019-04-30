@@ -1,5 +1,4 @@
 from database_connection import connection
-import psycopg2
 
 getPublicConnection = connection.getPublicConnection()
 
