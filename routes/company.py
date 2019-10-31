@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from services.company import createCompany, getAllCompanies, updateCompany, deleteCompany
+import json
 
 def company(app):
     @app.route('/admin/company', methods=['POST'])

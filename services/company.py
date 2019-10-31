@@ -28,11 +28,6 @@ def getAllCompanies(admin_id):
         cursor = getPublicConnection.cursor(buffered=True)
         cursor.execute(query)
         companies = cursor.fetchall()
-        if not companies:
-            return {
-                'status': 404,
-                'message': 'Not Found'
-            }
         return {
                 'status': 200,
                 'message': companies 

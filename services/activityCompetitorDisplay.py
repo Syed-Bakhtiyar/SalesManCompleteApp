@@ -2,7 +2,7 @@ from database_connection import connection
 from common.common import convertBase64ToImage
 getPublicConnection = connection.getPublicConnection()
 
-def createActivity(SHOP_ID, PRODUCT_TYPE_ID, PRODUCT_SUB_TYPE_ID, COMMENTS, IMAGE, ACTIVITY_TYPE,DATETODAY):
+def createActivity(SHOP_ID, PRODUCT_TYPE_ID, PRODUCT_SUB_TYPE_ID, COMMENTS, IMAGE, ACTIVITY_TYPE, DATETODAY):
 
     IMAGE_PATH = convertBase64ToImage(IMAGE)
 

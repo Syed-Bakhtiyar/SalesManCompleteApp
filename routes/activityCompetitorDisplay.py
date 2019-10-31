@@ -12,7 +12,7 @@ def activity(app):
             image = request.form['image']
             activity_type = request.form['activity_type']
             date_today = request.form['date_today']
-            creatrActivity(shop_id, product_type_id, product_sub_type_id, comments, image, activity_type, date_today)
+            createActivity(shop_id, product_type_id, product_sub_type_id, comments, image, activity_type, date_today)
             return shop_id
         else:
             return "hello"
